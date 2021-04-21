@@ -46,20 +46,20 @@ export const Read = () => {
     };
   };
   
-  export const Create = (data) => {
-      return (dispatch) => {
-        Axios
-          .post("https://jsonplaceholder.typicode.com/users",data)
-          .then((response) => {
-             const users=response.data
-             dispatch(postUsersSuccess(users))
-          }
-          )
-          .catch((error) => {
-            console.log(error);
-          });
-      };
-    };
+  // export const Create = (data) => {
+  //     return (dispatch) => {
+  //       Axios
+  //         .post("https://jsonplaceholder.typicode.com/users",data)
+  //         .then((response) => {
+  //            const users=response.data
+  //            dispatch(postUsersSuccess(users))
+  //         }
+  //         )
+  //         .catch((error) => {
+  //           console.log(error);
+  //         });
+  //     };
+  //   };
     // export const Delete = (data) => {
 
     //   return (dispatch) => {

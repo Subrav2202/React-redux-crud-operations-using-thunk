@@ -8,7 +8,6 @@ import {
   Read,
   postUsersSuccess,
   deleteUsersSuccess,
-  updateUsersSuccess,
 } from "../Components/Store/Action";
 
 function Home() {
@@ -18,27 +17,27 @@ function Home() {
   const dispatch = useDispatch();
 
   let initialState = {
-    id: "",
     name: "",
     username: "",
     email: "",
   };
 
-  const [state, setstate] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const [update, setupdate] = useState(false);
-  const [updateto, setupdateto] = useState(initialState);
+  const [index, setIndex] = useState()
 
   const data = useSelector((state) => state);
 
   useEffect(() => {
     dispatch(Read());
-  }, []);
+  }, [dispatch]);
 
   // console.log(data)/////data,it is an object,,,,users,it is an array ////////////////
+  ////////////////////////////////////Add///////////////////////////////////////////////
 
   const createHandler = (e) => {
     const value = e.target.value;
-    setstate({ ...state, [e.target.name]: value });
+    setState({ ...state, [e.target.name]: value });
   };
 
   const submitHandler = (e) => {
@@ -46,28 +45,53 @@ function Home() {
       modify(e);
     } else {
       e.preventDefault();
-      data.users.push(state);
-      dispatch(postUsersSuccess(data.users));
-      setstate(initialState);
-      alert("added new user");
+      validations();
     }
   };
 
-  const updatehandler = (item) => {
-    setupdate(true);
-    updateto.id = item.id;
-    updateto.name = item.name;
-    updateto.username = item.username;
-    updateto.email = item.email;
-    deletehandler(item);
+  const validations = () => {
+    let email = state.email.toLowerCase();
+    let filter = data.users.filter(
+      (user) => user.email.toLowerCase() === email
+    );
+    if (filter.length) {
+      alert("user already exist");
+      setState(initialState);
+      return;
+    }
+    data.users.push(state);
+    dispatch(postUsersSuccess(data.users));
+    setState(initialState);
+    alert("added new user");
+  };
+
+  //////////////////////////////update functionality/////////////////////////////////
+
+  const updatehandler = (item,index) => {
+    setupdate(true)
+    setState(prevState=>({
+      ...prevState,
+      name:item.name,
+      username:item.username,
+      email:item.email
+    })
+    )
+    // state.id = item.id;
+    // state.name = item.name;
+    // state.username = item.username;
+    // state.email = item.email;
+    setIndex(index)
+  
   };
   const modify = (e) => {
     e.preventDefault();
-    data.users.push(state);
-    dispatch(updateUsersSuccess(data.users));
-    setupdateto(initialState);
-    alert("updated");
+    data.users.splice(index,1,state)
+    setState(initialState);
+    setupdate(false);
+    // alert("updated");
   };
+
+  //////////////////////////////delete functionality/////////////////////////////////
 
   const deletehandler = (item) => {
     for (let value of data.users) {
@@ -80,10 +104,13 @@ function Home() {
     dispatch(deleteUsersSuccess(test));
   };
 
+  //////////////////////////////sign out  functionality/////////////////////////////////
+
   const signOutHandler = () => {
     localStorage.clear();
     history.push("/");
   };
+
   return (
     <div>
       <div className="d-flex align-items-center justify-content-end m-2">
@@ -97,25 +124,14 @@ function Home() {
             <h3>Data manipulation by using JSON placeholder</h3>
             <Form>
               <Form.Group>
-                <Form.Label>Id</Form.Label>
-                <Form.Control
-                  placeholder="Enter id"
-                  type="text"
-                  name="id"
-                  // value={state.id}
-                  onChange={createHandler}
-                  defaultValue={update ? updateto.id : state.id}
-                />
-              </Form.Group>
-              <Form.Group>
                 <Form.Label>Name</Form.Label>
                 <Form.Control
                   placeholder="Enter name"
                   type="text"
                   name="name"
-                  // value={state.name}
+                  value={state.name}
                   onChange={createHandler}
-                  defaultValue={update ? updateto.name : state.name}
+                  // defaultValue={update ? updateto.name : state.name}
                 />
               </Form.Group>
               <Form.Group>
@@ -124,9 +140,9 @@ function Home() {
                   placeholder="Enter username"
                   type="text"
                   name="username"
-                  // value={state.username}
+                  value={state.username}
                   onChange={createHandler}
-                  defaultValue={update ? updateto.username : state.username}
+                  // defaultValue={update ? updateto.username : state.username}
                 />
               </Form.Group>
               <Form.Group controlId="formBasicEmail">
@@ -135,9 +151,9 @@ function Home() {
                   type="email"
                   placeholder="Enter email"
                   name="email"
-                  // value={state.email}
+                  value={state.email}
                   onChange={createHandler}
-                  defaultValue={update ? updateto.email : state.email}
+                  // defaultValue={update ? updateto.email : state.email}
                 />
               </Form.Group>
               <Form.Group controlId="formBasicEmail">
@@ -153,7 +169,6 @@ function Home() {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Username</th>
             <th>Email</th>
@@ -165,12 +180,11 @@ function Home() {
           {data.users.map((item, index) => {
             return (
               <tr key={index}>
-                <td>{item.id}</td>
                 <td>{item.name}</td>
                 <td>{item.username}</td>
                 <td>{item.email}</td>
                 <td>
-                  <Button onClick={() => updatehandler(item)}>Update</Button>
+                  <Button onClick={() => updatehandler(item,index)}>Update</Button>
                 </td>
                 <td>
                   <Button onClick={() => deletehandler(item)}>delete</Button>

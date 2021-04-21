@@ -41,12 +41,19 @@ function Login() {
   const loginSubmitHandler = (e) => {
     e.preventDefault();
     const data = JSON.parse(localStorage.getItem("userdata"));
-    if (data.email === logindata.email) {
-      console.log("hello");
-      history.push("/home");
-    } else {
-      alert("you are not authorised user");
+    if(data !==null)
+    {
+      if (data.email === logindata.email) {
+        console.log("hello");
+        history.push("/home");
+      } else {
+        alert("you are not authorised user");
+      }
     }
+    else{
+      alert("You have to register first !!!")
+    }
+  
   };
 
   return (
